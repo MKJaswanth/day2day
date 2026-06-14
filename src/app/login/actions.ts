@@ -1,8 +1,9 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { headers } from "next/headers"
+import { cookies, headers } from "next/headers"
 import { redirect } from "next/navigation"
+import { REMEMBER_COOKIE } from "@/lib/supabase/cookies"
 import { createClient } from "@/lib/supabase/server"
 
 /** Resolve this deployment's origin from request headers (works local + Vercel). */
@@ -18,8 +19,17 @@ export type AuthState = { error?: string; message?: string }
 export async function signIn(_prev: AuthState, formData: FormData): Promise<AuthState> {
   const email = String(formData.get("email") ?? "")
   const password = String(formData.get("password") ?? "")
+  const remember = formData.get("remember") === "on"
 
-  const supabase = await createClient()
+  // Persist the preference so middleware keeps cookies session-only when off.
+  const store = await cookies()
+  store.set(REMEMBER_COOKIE, remember ? "1" : "0", {
+    path: "/",
+    sameSite: "lax",
+    maxAge: remember ? 60 * 60 * 24 * 365 : undefined,
+  })
+
+  const supabase = await createClient({ persistSession: remember })
   const { error } = await supabase.auth.signInWithPassword({ email, password })
   if (error) return { error: error.message }
 

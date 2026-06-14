@@ -34,7 +34,7 @@ export function CommandPalette() {
       open={commandOpen}
       onOpenChange={setCommandOpen}
       label="Command palette"
-      className="fixed left-1/2 top-[20%] z-50 w-full max-w-xl -translate-x-1/2 overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground shadow-2xl shadow-black/20 data-[state=open]:animate-in data-[state=open]:fade-in-0"
+      className="fixed left-1/2 top-[12%] z-50 w-[calc(100%-1.5rem)] max-w-xl -translate-x-1/2 overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground shadow-2xl shadow-black/20 data-[state=open]:animate-in data-[state=open]:fade-in-0 sm:top-[20%]"
       overlayClassName="fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px]"
     >
       <div className="flex items-center gap-2 border-b border-border px-4">

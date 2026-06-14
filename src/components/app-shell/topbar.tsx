@@ -1,19 +1,28 @@
 "use client"
 
-import { Moon, Plus, Search, Sun } from "lucide-react"
+import { Menu, Moon, Plus, Search, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
 import { useUIStore } from "@/lib/ui-store"
 
-export function Topbar({ title }: { title: string }) {
+export function Topbar({ title, onMenuClick }: { title: string; onMenuClick: () => void }) {
   const { setCommandOpen, setCaptureOpen } = useUIStore()
   const { resolvedTheme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
 
   return (
-    <header className="flex h-14 shrink-0 items-center gap-3 border-b border-border px-5">
-      <h1 className="font-serif text-lg font-semibold tracking-tight">{title}</h1>
+    <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border px-3 sm:gap-3 sm:px-5">
+      <button
+        type="button"
+        aria-label="Open menu"
+        onClick={onMenuClick}
+        className="flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground md:hidden"
+      >
+        <Menu className="size-5" />
+      </button>
+
+      <h1 className="truncate font-serif text-lg font-semibold tracking-tight">{title}</h1>
 
       <button
         type="button"

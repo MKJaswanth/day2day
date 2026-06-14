@@ -44,7 +44,7 @@ export function QuickCapture() {
       }}
       label="Quick capture"
       shouldFilter={false}
-      className="fixed left-1/2 top-[22%] z-50 w-full max-w-lg -translate-x-1/2 overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground shadow-2xl shadow-black/20"
+      className="fixed left-1/2 top-[14%] z-50 w-[calc(100%-1.5rem)] max-w-lg -translate-x-1/2 overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground shadow-2xl shadow-black/20 sm:top-[22%]"
       overlayClassName="fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px]"
     >
       <div className="px-4 pt-4">

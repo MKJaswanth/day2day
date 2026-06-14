@@ -85,6 +85,18 @@ export function LoginForm({ initialError }: { initialError?: string }) {
           </div>
         </div>
 
+        {mode === "signin" ? (
+          <label className="flex items-center gap-2 text-sm text-muted-foreground select-none">
+            <input
+              type="checkbox"
+              name="remember"
+              defaultChecked
+              className="size-4 rounded border-input accent-primary"
+            />
+            Remember me on this device
+          </label>
+        ) : null}
+
         {state.error ? <p className="text-sm text-destructive">{state.error}</p> : null}
         {state.message ? <p className="text-sm text-success">{state.message}</p> : null}
 

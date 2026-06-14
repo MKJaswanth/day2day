@@ -7,11 +7,20 @@ import { signOut } from "@/app/login/actions"
 import { collectionsNav, type NavItem, primaryNav, systemNav } from "@/lib/navigation"
 import { cn } from "@/lib/utils"
 
-function NavLink({ item, active }: { item: NavItem; active: boolean }) {
+function NavLink({
+  item,
+  active,
+  onNavigate,
+}: {
+  item: NavItem
+  active: boolean
+  onNavigate?: () => void
+}) {
   const Icon = item.icon
   return (
     <Link
       href={item.href}
+      onClick={onNavigate}
       className={cn(
         "group flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm transition-colors",
         active
@@ -36,7 +45,15 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
   )
 }
 
-function Section({ items, label }: { items: NavItem[]; label?: string }) {
+function Section({
+  items,
+  label,
+  onNavigate,
+}: {
+  items: NavItem[]
+  label?: string
+  onNavigate?: () => void
+}) {
   const pathname = usePathname()
   return (
     <div className="space-y-0.5">
@@ -46,13 +63,26 @@ function Section({ items, label }: { items: NavItem[]; label?: string }) {
         </p>
       ) : null}
       {items.map((item) => (
-        <NavLink key={item.href} item={item} active={pathname === item.href} />
+        <NavLink
+          key={item.href}
+          item={item}
+          active={pathname === item.href}
+          onNavigate={onNavigate}
+        />
       ))}
     </div>
   )
 }
 
-export function Sidebar({ userName, userEmail }: { userName: string; userEmail: string }) {
+export function Sidebar({
+  userName,
+  userEmail,
+  onNavigate,
+}: {
+  userName: string
+  userEmail: string
+  onNavigate?: () => void
+}) {
   return (
     <aside className="flex h-full w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
       <div className="flex h-14 items-center gap-2 px-4">
@@ -63,9 +93,9 @@ export function Sidebar({ userName, userEmail }: { userName: string; userEmail: 
       </div>
 
       <nav className="flex-1 overflow-y-auto px-2 pb-4">
-        <Section items={primaryNav} />
-        <Section items={collectionsNav} label="Collections" />
-        <Section items={systemNav} label="System" />
+        <Section items={primaryNav} onNavigate={onNavigate} />
+        <Section items={collectionsNav} label="Collections" onNavigate={onNavigate} />
+        <Section items={systemNav} label="System" onNavigate={onNavigate} />
       </nav>
 
       <div className="space-y-2 border-t border-sidebar-border p-3">
