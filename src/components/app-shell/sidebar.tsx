@@ -5,18 +5,22 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { signOut } from "@/app/login/actions"
 import { collectionsNav, type NavItem, primaryNav, systemNav } from "@/lib/navigation"
+import { useInboxItems } from "@/lib/queries/inbox"
 import { cn } from "@/lib/utils"
 
 function NavLink({
   item,
   active,
   onNavigate,
+  badge,
 }: {
   item: NavItem
   active: boolean
   onNavigate?: () => void
+  badge?: number
 }) {
   const Icon = item.icon
+  const count = badge ?? item.badge
   return (
     <Link
       href={item.href}
@@ -36,9 +40,9 @@ function NavLink({
         strokeWidth={2}
       />
       <span className="flex-1 truncate">{item.label}</span>
-      {item.badge ? (
+      {count ? (
         <span className="tabular-nums rounded-full bg-sidebar-primary/10 px-1.5 text-xs font-medium text-sidebar-primary">
-          {item.badge}
+          {count}
         </span>
       ) : null}
     </Link>
@@ -49,10 +53,12 @@ function Section({
   items,
   label,
   onNavigate,
+  counts,
 }: {
   items: NavItem[]
   label?: string
   onNavigate?: () => void
+  counts?: Record<string, number>
 }) {
   const pathname = usePathname()
   return (
@@ -68,6 +74,7 @@ function Section({
           item={item}
           active={pathname === item.href}
           onNavigate={onNavigate}
+          badge={counts?.[item.href]}
         />
       ))}
     </div>
@@ -83,6 +90,10 @@ export function Sidebar({
   userEmail: string
   onNavigate?: () => void
 }) {
+  const { data: inbox } = useInboxItems()
+  const counts: Record<string, number> = {}
+  if (inbox && inbox.length > 0) counts["/inbox"] = inbox.length
+
   return (
     <aside className="flex h-full w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
       <div className="flex h-14 items-center gap-2 px-4">
@@ -93,7 +104,7 @@ export function Sidebar({
       </div>
 
       <nav className="flex-1 overflow-y-auto px-2 pb-4">
-        <Section items={primaryNav} onNavigate={onNavigate} />
+        <Section items={primaryNav} onNavigate={onNavigate} counts={counts} />
         <Section items={collectionsNav} label="Collections" onNavigate={onNavigate} />
         <Section items={systemNav} label="System" onNavigate={onNavigate} />
       </nav>

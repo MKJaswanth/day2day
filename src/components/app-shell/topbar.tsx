@@ -36,6 +36,7 @@ export function Topbar({ title, onMenuClick }: { title: string; onMenuClick: () 
 
       <button
         type="button"
+        data-testid="capture-button"
         onClick={() => setCaptureOpen(true)}
         className="flex h-8 items-center gap-1.5 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
       >

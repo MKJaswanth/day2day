@@ -20,14 +20,14 @@ export type NavItem = {
 
 /** Left sidebar navigation, per the design doc's three-zone frame. */
 export const primaryNav: NavItem[] = [
-  { label: "Inbox", href: "/inbox", icon: Inbox, badge: 3 },
+  { label: "Inbox", href: "/inbox", icon: Inbox },
   { label: "Today", href: "/today", icon: Sun },
   { label: "Upcoming", href: "/upcoming", icon: CalendarClock },
 ]
 
 export const collectionsNav: NavItem[] = [
   { label: "Projects", href: "/projects", icon: FolderKanban },
-  { label: "Follow-ups", href: "/follow-ups", icon: CheckSquare, badge: 2 },
+  { label: "Follow-ups", href: "/follow-ups", icon: CheckSquare },
   { label: "Learning", href: "/learning", icon: BookOpen },
   { label: "Goals", href: "/goals", icon: Target },
 ]

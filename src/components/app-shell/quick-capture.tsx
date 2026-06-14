@@ -4,15 +4,17 @@ import * as chrono from "chrono-node"
 import { Command } from "cmdk"
 import { CalendarDays, CornerDownLeft } from "lucide-react"
 import { useEffect, useState } from "react"
+import { useAddInboxItem } from "@/lib/queries/inbox"
 import { useUIStore } from "@/lib/ui-store"
 
 /**
  * ⌘N global quick-capture (CAP-1/2/6). Minimal modal, natural-language date
- * parsing, sub-two-second feel. Persistence wired in Phase 1.
+ * parsing, sub-two-second feel. Persists to inbox_items with optimistic update.
  */
 export function QuickCapture() {
   const { captureOpen, setCaptureOpen } = useUIStore()
   const [value, setValue] = useState("")
+  const addItem = useAddInboxItem()
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -30,7 +32,11 @@ export function QuickCapture() {
   const parsedDate = parsed?.start?.date()
 
   function submit() {
-    // TODO(Phase 1): write to inbox via TanStack Query optimistic mutation.
+    const content = value.trim()
+    if (!content) return
+    // Store the date as YYYY-MM-DD (the column is a DATE).
+    const parsedDateStr = parsedDate ? parsedDate.toISOString().slice(0, 10) : null
+    addItem.mutate({ content, parsedDate: parsedDateStr })
     setValue("")
     setCaptureOpen(false)
   }
