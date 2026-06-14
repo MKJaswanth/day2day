@@ -1,7 +1,9 @@
 "use client"
 
+import { LogOut } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { signOut } from "@/app/login/actions"
 import { collectionsNav, type NavItem, primaryNav, systemNav } from "@/lib/navigation"
 import { cn } from "@/lib/utils"
 
@@ -50,7 +52,7 @@ function Section({ items, label }: { items: NavItem[]; label?: string }) {
   )
 }
 
-export function Sidebar() {
+export function Sidebar({ userEmail }: { userEmail: string }) {
   return (
     <aside className="flex h-full w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
       <div className="flex h-14 items-center gap-2 px-4">
@@ -66,7 +68,7 @@ export function Sidebar() {
         <Section items={systemNav} label="System" />
       </nav>
 
-      <div className="border-t border-sidebar-border p-3">
+      <div className="space-y-2 border-t border-sidebar-border p-3">
         <p className="px-1 text-xs text-muted-foreground">
           <kbd className="rounded border border-border bg-background px-1 font-sans">⌘K</kbd>{" "}
           commands
@@ -74,6 +76,23 @@ export function Sidebar() {
           <kbd className="rounded border border-border bg-background px-1 font-sans">⌘N</kbd>{" "}
           capture
         </p>
+        <div className="flex items-center gap-2 rounded-md px-1">
+          <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-sidebar-accent text-xs font-medium text-sidebar-accent-foreground uppercase">
+            {userEmail.charAt(0)}
+          </div>
+          <span className="min-w-0 flex-1 truncate text-xs text-sidebar-foreground">
+            {userEmail}
+          </span>
+          <form action={signOut}>
+            <button
+              type="submit"
+              aria-label="Sign out"
+              className="flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground"
+            >
+              <LogOut className="size-4" />
+            </button>
+          </form>
+        </div>
       </div>
     </aside>
   )
