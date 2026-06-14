@@ -1,5 +1,7 @@
 "use client"
 
+import { Title as DialogTitle } from "@radix-ui/react-dialog"
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import * as chrono from "chrono-node"
 import { Command } from "cmdk"
 import { CalendarDays, CornerDownLeft } from "lucide-react"
@@ -53,6 +55,9 @@ export function QuickCapture() {
       className="fixed left-1/2 top-[14%] z-50 w-[calc(100%-1.5rem)] max-w-lg -translate-x-1/2 overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground shadow-2xl shadow-black/20 sm:top-[22%]"
       overlayClassName="fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px]"
     >
+      <VisuallyHidden asChild>
+        <DialogTitle>Quick capture</DialogTitle>
+      </VisuallyHidden>
       <div className="px-4 pt-4">
         <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
           Quick capture
