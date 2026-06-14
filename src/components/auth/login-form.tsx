@@ -1,14 +1,14 @@
 "use client"
 
+import { Eye, EyeOff } from "lucide-react"
 import { useActionState, useState } from "react"
 import { type AuthState, signIn, signUp } from "@/app/login/actions"
 
-const initial: AuthState = {}
-
-export function LoginForm() {
+export function LoginForm({ initialError }: { initialError?: string }) {
   const [mode, setMode] = useState<"signin" | "signup">("signin")
+  const [showPassword, setShowPassword] = useState(false)
   const action = mode === "signin" ? signIn : signUp
-  const [state, formAction, pending] = useActionState(action, initial)
+  const [state, formAction, pending] = useActionState(action, { error: initialError })
 
   return (
     <div className="w-full max-w-sm">
@@ -29,6 +29,23 @@ export function LoginForm() {
       </p>
 
       <form action={formAction} className="mt-6 space-y-3">
+        {mode === "signup" ? (
+          <div className="space-y-1.5">
+            <label htmlFor="name" className="text-sm font-medium">
+              Name
+            </label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              required
+              autoComplete="name"
+              placeholder="Jaswanth"
+              className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
+            />
+          </div>
+        ) : null}
+
         <div className="space-y-1.5">
           <label htmlFor="email" className="text-sm font-medium">
             Email
@@ -47,15 +64,25 @@ export function LoginForm() {
           <label htmlFor="password" className="text-sm font-medium">
             Password
           </label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            required
-            minLength={6}
-            autoComplete={mode === "signin" ? "current-password" : "new-password"}
-            className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
-          />
+          <div className="relative">
+            <input
+              id="password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              required
+              minLength={6}
+              autoComplete={mode === "signin" ? "current-password" : "new-password"}
+              className="h-10 w-full rounded-md border border-input bg-background px-3 pr-10 text-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              className="absolute right-2 top-1/2 -translate-y-1/2 flex size-7 items-center justify-center rounded text-muted-foreground transition-colors hover:text-foreground"
+            >
+              {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+            </button>
+          </div>
         </div>
 
         {state.error ? <p className="text-sm text-destructive">{state.error}</p> : null}

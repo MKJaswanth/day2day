@@ -52,7 +52,7 @@ function Section({ items, label }: { items: NavItem[]; label?: string }) {
   )
 }
 
-export function Sidebar({ userEmail }: { userEmail: string }) {
+export function Sidebar({ userName, userEmail }: { userName: string; userEmail: string }) {
   return (
     <aside className="flex h-full w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
       <div className="flex h-14 items-center gap-2 px-4">
@@ -78,11 +78,16 @@ export function Sidebar({ userEmail }: { userEmail: string }) {
         </p>
         <div className="flex items-center gap-2 rounded-md px-1">
           <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-sidebar-accent text-xs font-medium text-sidebar-accent-foreground uppercase">
-            {userEmail.charAt(0)}
+            {(userName || userEmail).charAt(0)}
           </div>
-          <span className="min-w-0 flex-1 truncate text-xs text-sidebar-foreground">
-            {userEmail}
-          </span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-xs font-medium capitalize text-sidebar-accent-foreground">
+              {userName}
+            </p>
+            {userEmail ? (
+              <p className="truncate text-[0.6875rem] text-muted-foreground">{userEmail}</p>
+            ) : null}
+          </div>
           <form action={signOut}>
             <button
               type="submit"

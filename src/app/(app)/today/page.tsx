@@ -1,4 +1,6 @@
 import { BookOpen, CheckSquare, Circle, Clock } from "lucide-react"
+import { createClient } from "@/lib/supabase/server"
+import { firstNameFromUser } from "@/lib/user"
 
 const tasks = [
   { id: 1, title: "Draft Q3 planning outline", project: "Roadmap", done: false, priority: true },
@@ -13,7 +15,7 @@ const followups = [
 
 const learning = [{ id: 1, title: "Designing Data-Intensive Apps", unit: "Ch. 6 of 12" }]
 
-function Greeting() {
+function Greeting({ name }: { name: string | null }) {
   const now = new Date()
   const hour = now.getHours()
   const part = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening"
@@ -25,7 +27,9 @@ function Greeting() {
   return (
     <div className="mb-8">
       <p className="tabular-nums text-sm text-muted-foreground">{date}</p>
-      <h2 className="mt-1 font-serif text-2xl font-semibold tracking-tight">{part}.</h2>
+      <h2 className="mt-1 font-serif text-2xl font-semibold tracking-tight">
+        {name ? `${part}, ${name}.` : `${part}.`}
+      </h2>
     </div>
   )
 }
@@ -50,10 +54,15 @@ function SectionLabel({
   )
 }
 
-export default function TodayPage() {
+export default async function TodayPage() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
   return (
     <div className="mx-auto max-w-2xl px-6 py-8">
-      <Greeting />
+      <Greeting name={firstNameFromUser(user)} />
 
       <section className="mb-8">
         <SectionLabel icon={CheckSquare} label="Tasks" count={tasks.length} />

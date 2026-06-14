@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation"
 import { AppShell } from "@/components/app-shell/app-shell"
 import { createClient } from "@/lib/supabase/server"
+import { displayNameFromUser } from "@/lib/user"
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -11,5 +12,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // Middleware already guards this, but belt-and-suspenders for the data layer.
   if (!user) redirect("/login")
 
-  return <AppShell userEmail={user.email ?? "you"}>{children}</AppShell>
+  return (
+    <AppShell userName={displayNameFromUser(user)} userEmail={user.email ?? ""}>
+      {children}
+    </AppShell>
+  )
 }

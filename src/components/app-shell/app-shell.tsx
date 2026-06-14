@@ -9,9 +9,11 @@ import { Topbar } from "./topbar"
 
 export function AppShell({
   children,
+  userName,
   userEmail,
 }: {
   children: React.ReactNode
+  userName: string
   userEmail: string
 }) {
   const pathname = usePathname()
@@ -19,7 +21,7 @@ export function AppShell({
 
   return (
     <div className="flex h-dvh overflow-hidden">
-      <Sidebar userEmail={userEmail} />
+      <Sidebar userName={userName} userEmail={userEmail} />
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar title={title} />
         <main className="flex-1 overflow-y-auto">{children}</main>
