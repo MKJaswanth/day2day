@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
+import { PeekPanel } from "@/components/peek/peek-panel"
 import { allNav } from "@/lib/navigation"
 import { cn } from "@/lib/utils"
 import { CommandPalette } from "./command-palette"
@@ -23,6 +24,7 @@ export function AppShell({
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   // Close the mobile drawer on route change.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: run on pathname change
   useEffect(() => {
     setDrawerOpen(false)
   }, [pathname])
@@ -67,6 +69,7 @@ export function AppShell({
       {/* Global overlays */}
       <CommandPalette />
       <QuickCapture />
+      <PeekPanel />
     </div>
   )
 }

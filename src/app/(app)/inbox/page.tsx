@@ -1,7 +1,8 @@
 "use client"
 
-import { CalendarDays, Check, Inbox as InboxIcon, Trash2 } from "lucide-react"
+import { CalendarDays, Check, Inbox as InboxIcon, SquareCheckBig, Trash2 } from "lucide-react"
 import { type InboxItem, useDeleteInboxItem, useInboxItems } from "@/lib/queries/inbox"
+import { useAddTask } from "@/lib/queries/tasks"
 
 function relativeTime(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime()
@@ -16,7 +17,14 @@ function relativeTime(iso: string): string {
 
 function Row({ item }: { item: InboxItem }) {
   const del = useDeleteInboxItem()
+  const addTask = useAddTask()
   const isOptimistic = item.id.startsWith("optimistic-")
+
+  function triageToTask() {
+    addTask.mutate({ title: item.content, scheduledDate: item.parsed_date })
+    del.mutate(item.id)
+  }
+
   return (
     <li className="group flex items-center gap-3 px-3.5 py-3">
       <button
@@ -44,6 +52,15 @@ function Row({ item }: { item: InboxItem }) {
       <span className="tabular-nums shrink-0 text-xs text-muted-foreground">
         {relativeTime(item.created_at)}
       </span>
+      <button
+        type="button"
+        disabled={isOptimistic}
+        onClick={triageToTask}
+        className="flex shrink-0 items-center gap-1 rounded-md border border-border px-2 py-1 text-xs text-muted-foreground opacity-0 transition-opacity hover:bg-secondary hover:text-foreground group-hover:opacity-100"
+      >
+        <SquareCheckBig className="size-3.5" />
+        Make task
+      </button>
       <button
         type="button"
         aria-label="Delete"

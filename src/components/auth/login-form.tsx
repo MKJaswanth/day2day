@@ -2,7 +2,7 @@
 
 import { Eye, EyeOff } from "lucide-react"
 import { useActionState, useState } from "react"
-import { type AuthState, signIn, signUp } from "@/app/login/actions"
+import { signIn, signUp } from "@/app/login/actions"
 
 export function LoginForm({ initialError }: { initialError?: string }) {
   const [mode, setMode] = useState<"signin" | "signup">("signin")
