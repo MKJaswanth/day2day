@@ -5,6 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { signOut } from "@/app/login/actions"
 import { collectionsNav, type NavItem, primaryNav, systemNav } from "@/lib/navigation"
+import { useFollowUps } from "@/lib/queries/follow-ups"
 import { useInboxItems } from "@/lib/queries/inbox"
 import { cn } from "@/lib/utils"
 
@@ -91,8 +92,11 @@ export function Sidebar({
   onNavigate?: () => void
 }) {
   const { data: inbox } = useInboxItems()
+  const { data: followUps } = useFollowUps()
   const counts: Record<string, number> = {}
   if (inbox && inbox.length > 0) counts["/inbox"] = inbox.length
+  const openFollowUps = (followUps ?? []).filter((f) => f.status === "open").length
+  if (openFollowUps > 0) counts["/follow-ups"] = openFollowUps
 
   return (
     <aside className="flex h-full w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
@@ -105,7 +109,12 @@ export function Sidebar({
 
       <nav className="flex-1 overflow-y-auto px-2 pb-4">
         <Section items={primaryNav} onNavigate={onNavigate} counts={counts} />
-        <Section items={collectionsNav} label="Collections" onNavigate={onNavigate} />
+        <Section
+          items={collectionsNav}
+          label="Collections"
+          onNavigate={onNavigate}
+          counts={counts}
+        />
         <Section items={systemNav} label="System" onNavigate={onNavigate} />
       </nav>
 
