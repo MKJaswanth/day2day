@@ -3,6 +3,9 @@
 import { AlertCircle, Check, Trash2, X } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { RichText } from "@/components/editor/rich-text"
+import { RelatedItems } from "@/components/peek/related-items"
+import { useAreas } from "@/lib/queries/areas"
+import { useGoals } from "@/lib/queries/goals"
 import {
   type Project,
   type ProjectStatus,
@@ -30,6 +33,8 @@ export function ProjectPeek({ projectId }: { projectId: string }) {
   const { data: projects } = useProjects()
   const project = projects?.find((p) => p.id === projectId)
   const { data: tasks } = useProjectTasks(projectId)
+  const { data: areas } = useAreas()
+  const { data: goals } = useGoals()
   const update = useUpdateProject()
   const del = useDeleteProject()
   const addTask = useAddProjectTask(projectId)
@@ -132,6 +137,44 @@ export function ProjectPeek({ projectId }: { projectId: string }) {
               className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm outline-none focus-visible:border-ring"
             />
           </label>
+          <label className="flex flex-col gap-1">
+            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Area
+            </span>
+            <select
+              value={project.area_id ?? ""}
+              onChange={(e) =>
+                update.mutate({ id: projectId, patch: { area_id: e.target.value || null } })
+              }
+              className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm outline-none focus-visible:border-ring"
+            >
+              <option value="">— None —</option>
+              {areas?.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex flex-col gap-1">
+            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Goal
+            </span>
+            <select
+              value={project.goal_id ?? ""}
+              onChange={(e) =>
+                update.mutate({ id: projectId, patch: { goal_id: e.target.value || null } })
+              }
+              className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm outline-none focus-visible:border-ring"
+            >
+              <option value="">— None —</option>
+              {goals?.map((g) => (
+                <option key={g.id} value={g.id}>
+                  {g.title}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
 
         {/* Next action */}
@@ -224,6 +267,8 @@ export function ProjectPeek({ projectId }: { projectId: string }) {
             className="mt-2 h-8 w-full rounded-md border border-input bg-background px-2 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring"
           />
         </div>
+
+        <RelatedItems type="project" id={projectId} />
 
         {/* Log */}
         <div>

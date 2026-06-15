@@ -3,6 +3,7 @@
 import { ArrowRightCircle, Trash2, X } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { RichText } from "@/components/editor/rich-text"
+import { RelatedItems } from "@/components/peek/related-items"
 import {
   type FollowUp,
   type FollowUpStatus,
@@ -165,6 +166,8 @@ export function FollowUpPeek({ followUpId }: { followUpId: string }) {
             </select>
           </label>
         </div>
+
+        <RelatedItems type="follow_up" id={followUpId} />
 
         <div>
           <p className="mb-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">

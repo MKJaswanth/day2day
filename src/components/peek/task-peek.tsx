@@ -3,6 +3,7 @@
 import { Check, Trash2, X } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { RichText } from "@/components/editor/rich-text"
+import { RelatedItems } from "@/components/peek/related-items"
 import {
   type Task,
   type TaskPriority,
@@ -136,6 +137,8 @@ export function TaskPeek({ taskId }: { taskId: string }) {
 
         {/* Subtasks */}
         <Subtasks parentId={taskId} />
+
+        <RelatedItems type="task" id={taskId} />
 
         {/* Notes */}
         <div>

@@ -3,6 +3,8 @@
 import { Trash2, X } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { RichText } from "@/components/editor/rich-text"
+import { RelatedItems } from "@/components/peek/related-items"
+import { useGoals } from "@/lib/queries/goals"
 import {
   type LearningItem,
   type LearningStatus,
@@ -29,6 +31,7 @@ export function LearningPeek({ itemId }: { itemId: string }) {
   const { data: items } = useLearningItems()
   const item = items?.find((l) => l.id === itemId)
   const { data: projects } = useProjects()
+  const { data: goals } = useGoals()
   const update = useUpdateLearningItem()
   const del = useDeleteLearningItem()
 
@@ -204,6 +207,25 @@ export function LearningPeek({ itemId }: { itemId: string }) {
             ))}
           </select>
         </Labeled>
+
+        <Labeled label="Goal">
+          <select
+            value={item.goal_id ?? ""}
+            onChange={(e) =>
+              update.mutate({ id: itemId, patch: { goal_id: e.target.value || null } })
+            }
+            className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm outline-none focus-visible:border-ring"
+          >
+            <option value="">— None —</option>
+            {goals?.map((g) => (
+              <option key={g.id} value={g.id}>
+                {g.title}
+              </option>
+            ))}
+          </select>
+        </Labeled>
+
+        <RelatedItems type="learning_item" id={itemId} />
 
         <div>
           <p className="mb-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
