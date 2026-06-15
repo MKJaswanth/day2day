@@ -3,6 +3,7 @@
 import { useEffect } from "react"
 import { useUIStore } from "@/lib/ui-store"
 import { cn } from "@/lib/utils"
+import { ProjectPeek } from "./project-peek"
 import { TaskPeek } from "./task-peek"
 
 /** Right-hand slide-over for editing any item without leaving the current view. */
@@ -37,6 +38,7 @@ export function PeekPanel() {
         )}
       >
         {peek?.type === "task" ? <TaskPeek taskId={peek.id} /> : null}
+        {peek?.type === "project" ? <ProjectPeek projectId={peek.id} /> : null}
       </aside>
     </>
   )

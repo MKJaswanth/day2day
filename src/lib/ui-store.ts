@@ -1,6 +1,6 @@
 import { create } from "zustand"
 
-type PeekTarget = { type: "task"; id: string } | null
+type PeekTarget = { type: "task"; id: string } | { type: "project"; id: string } | null
 
 type UIState = {
   commandOpen: boolean
