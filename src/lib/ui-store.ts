@@ -4,6 +4,7 @@ type PeekTarget =
   | { type: "task"; id: string }
   | { type: "project"; id: string }
   | { type: "follow_up"; id: string }
+  | { type: "learning_item"; id: string }
   | null
 
 type UIState = {

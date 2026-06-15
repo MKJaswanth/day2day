@@ -4,6 +4,7 @@ import { useEffect } from "react"
 import { useUIStore } from "@/lib/ui-store"
 import { cn } from "@/lib/utils"
 import { FollowUpPeek } from "./follow-up-peek"
+import { LearningPeek } from "./learning-peek"
 import { ProjectPeek } from "./project-peek"
 import { TaskPeek } from "./task-peek"
 
@@ -41,6 +42,7 @@ export function PeekPanel() {
         {peek?.type === "task" ? <TaskPeek taskId={peek.id} /> : null}
         {peek?.type === "project" ? <ProjectPeek projectId={peek.id} /> : null}
         {peek?.type === "follow_up" ? <FollowUpPeek followUpId={peek.id} /> : null}
+        {peek?.type === "learning_item" ? <LearningPeek itemId={peek.id} /> : null}
       </aside>
     </>
   )
