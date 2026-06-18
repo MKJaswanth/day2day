@@ -5,14 +5,48 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { Command } from "cmdk"
 import { ArrowRight, Plus, Search } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
+import { useEffect, useMemo } from "react"
 import { allNav } from "@/lib/navigation"
+import { useFollowUps } from "@/lib/queries/follow-ups"
+import { useGoals } from "@/lib/queries/goals"
+import { useLearningItems } from "@/lib/queries/learning"
+import { type ItemType, type LinkRef, TYPE_LABEL } from "@/lib/queries/links"
+import { useProjects } from "@/lib/queries/projects"
+import { useTasks } from "@/lib/queries/tasks"
 import { useUIStore } from "@/lib/ui-store"
 
-/** ⌘K command palette — the spine of navigation and actions (ORG-3). */
+type PeekType = Exclude<ItemType, "inbox_item">
+
+/** ⌘K command palette — navigation, actions, and global item search (ORG-1/3). */
 export function CommandPalette() {
   const router = useRouter()
   const { commandOpen, setCommandOpen, setCaptureOpen } = useUIStore()
+  const openPeek = useUIStore((s) => s.openPeek)
+
+  const { data: tasks } = useTasks()
+  const { data: projects } = useProjects()
+  const { data: followUps } = useFollowUps()
+  const { data: learning } = useLearningItems()
+  const { data: goals } = useGoals()
+
+  const items = useMemo<LinkRef[]>(
+    () => [
+      ...(tasks ?? [])
+        .filter((t) => !t.completed_at)
+        .map((t) => ({ type: "task" as const, id: t.id, label: t.title })),
+      ...(projects ?? []).map((p) => ({ type: "project" as const, id: p.id, label: p.title })),
+      ...(followUps ?? [])
+        .filter((f) => f.status === "open")
+        .map((f) => ({ type: "follow_up" as const, id: f.id, label: f.who })),
+      ...(learning ?? []).map((l) => ({
+        type: "learning_item" as const,
+        id: l.id,
+        label: l.title,
+      })),
+      ...(goals ?? []).map((g) => ({ type: "goal" as const, id: g.id, label: g.title })),
+    ],
+    [tasks, projects, followUps, learning, goals],
+  )
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: store setters are stable
   useEffect(() => {
@@ -29,6 +63,11 @@ export function CommandPalette() {
   function go(href: string) {
     setCommandOpen(false)
     router.push(href)
+  }
+
+  function peek(type: PeekType, id: string) {
+    setCommandOpen(false)
+    openPeek({ type, id })
   }
 
   return (
@@ -86,6 +125,27 @@ export function CommandPalette() {
             )
           })}
         </Command.Group>
+
+        {items.length > 0 ? (
+          <Command.Group
+            heading="Items"
+            className="mt-1 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground"
+          >
+            {items.map((it) => (
+              <Command.Item
+                key={`${it.type}:${it.id}`}
+                value={`${it.label} ${TYPE_LABEL[it.type]} ${it.id}`}
+                onSelect={() => peek(it.type as PeekType, it.id)}
+                className="group flex cursor-pointer items-center gap-2.5 rounded-md px-2 py-2 text-sm aria-selected:bg-accent aria-selected:text-accent-foreground"
+              >
+                <span className="shrink-0 rounded bg-secondary px-1.5 py-0.5 text-[0.625rem] uppercase text-muted-foreground">
+                  {TYPE_LABEL[it.type]}
+                </span>
+                <span className="truncate">{it.label}</span>
+              </Command.Item>
+            ))}
+          </Command.Group>
+        ) : null}
       </Command.List>
     </Command.Dialog>
   )

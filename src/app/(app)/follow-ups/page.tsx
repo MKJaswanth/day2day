@@ -2,6 +2,7 @@
 
 import { ArrowRightCircle, Check, Clock, Plus } from "lucide-react"
 import { useState } from "react"
+import { todayStr } from "@/lib/dates"
 import {
   type FollowUp,
   useAddFollowUp,
@@ -12,9 +13,6 @@ import {
 import { useUIStore } from "@/lib/ui-store"
 import { cn } from "@/lib/utils"
 
-function todayStr() {
-  return new Date().toISOString().slice(0, 10)
-}
 function daysSince(date: string) {
   const ms = Date.now() - new Date(`${date}T00:00:00`).getTime()
   return Math.max(0, Math.floor(ms / 86400000))

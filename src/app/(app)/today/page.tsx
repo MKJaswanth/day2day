@@ -1,4 +1,4 @@
-import { TodayTasks } from "@/components/tasks/today-tasks"
+import { TodayAgenda } from "@/components/tasks/today-agenda"
 import { createClient } from "@/lib/supabase/server"
 import { firstNameFromUser } from "@/lib/user"
 
@@ -30,12 +30,7 @@ export default async function TodayPage() {
   return (
     <div className="mx-auto max-w-2xl px-6 py-8">
       <Greeting name={firstNameFromUser(user)} />
-      <TodayTasks />
-      <p className="mt-6 text-center text-xs text-muted-foreground">
-        Follow-ups & learning join Today in Phase 2. Press{" "}
-        <kbd className="rounded border border-border bg-background px-1">⌘N</kbd> to capture, or add
-        a task above.
-      </p>
+      <TodayAgenda />
     </div>
   )
 }

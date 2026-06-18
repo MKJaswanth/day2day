@@ -6,6 +6,7 @@ import * as chrono from "chrono-node"
 import { Command } from "cmdk"
 import { CalendarDays, CornerDownLeft } from "lucide-react"
 import { useEffect, useState } from "react"
+import { toDateStr } from "@/lib/dates"
 import { useAddInboxItem } from "@/lib/queries/inbox"
 import { useUIStore } from "@/lib/ui-store"
 
@@ -37,7 +38,7 @@ export function QuickCapture() {
     const content = value.trim()
     if (!content) return
     // Store the date as YYYY-MM-DD (the column is a DATE).
-    const parsedDateStr = parsedDate ? parsedDate.toISOString().slice(0, 10) : null
+    const parsedDateStr = parsedDate ? toDateStr(parsedDate) : null
     addItem.mutate({ content, parsedDate: parsedDateStr })
     setValue("")
     setCaptureOpen(false)

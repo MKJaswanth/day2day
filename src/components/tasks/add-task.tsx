@@ -3,10 +3,11 @@
 import * as chrono from "chrono-node"
 import { Plus } from "lucide-react"
 import { useState } from "react"
+import { toDateStr, todayStr } from "@/lib/dates"
 import { useAddTask } from "@/lib/queries/tasks"
 
 /** Inline task creator with natural-language date parsing (e.g. "ship deck friday"). */
-export function AddTask() {
+export function AddTask({ scheduledToday = false }: { scheduledToday?: boolean }) {
   const add = useAddTask()
   const [value, setValue] = useState("")
 
@@ -17,9 +18,10 @@ export function AddTask() {
     const date = parsed?.start?.date()
     // Strip the matched date text from the title for a clean task name.
     const title = (parsed ? raw.replace(parsed.text, "").trim() : raw) || raw
+    const fallback = scheduledToday ? todayStr() : null
     add.mutate({
       title,
-      scheduledDate: date ? date.toISOString().slice(0, 10) : null,
+      scheduledDate: date ? toDateStr(date) : fallback,
     })
     setValue("")
   }
