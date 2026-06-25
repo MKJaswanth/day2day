@@ -1,7 +1,8 @@
 "use client"
 
-import { AlertCircle, FolderKanban, Plus } from "lucide-react"
+import { AlertCircle, Columns3, FolderKanban, List, Plus } from "lucide-react"
 import { useState } from "react"
+import { ProjectsBoard } from "@/components/projects/projects-board"
 import {
   type Project,
   type ProjectStatus,
@@ -89,6 +90,8 @@ export default function ProjectsPage() {
   const add = useAddProject()
   const [value, setValue] = useState("")
 
+  const [view, setView] = useState<"list" | "board">("list")
+
   function submit() {
     if (!value.trim()) return
     add.mutate({ title: value.trim() })
@@ -96,12 +99,38 @@ export default function ProjectsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-8">
-      <div className="mb-6">
-        <h2 className="font-serif text-2xl font-semibold tracking-tight">Projects</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Outcomes you're driving. Each should have a clear next action.
-        </p>
+    <div className={cn("px-6 py-8", view === "board" ? "max-w-none" : "mx-auto max-w-3xl")}>
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div>
+          <h2 className="font-serif text-2xl font-semibold tracking-tight">Projects</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Outcomes you're driving. Each should have a clear next action.
+          </p>
+        </div>
+        <div className="flex shrink-0 items-center gap-1 rounded-md border border-border p-0.5">
+          <button
+            type="button"
+            aria-label="List view"
+            onClick={() => setView("list")}
+            className={cn(
+              "flex size-7 items-center justify-center rounded",
+              view === "list" ? "bg-secondary text-foreground" : "text-muted-foreground",
+            )}
+          >
+            <List className="size-4" />
+          </button>
+          <button
+            type="button"
+            aria-label="Board view"
+            onClick={() => setView("board")}
+            className={cn(
+              "flex size-7 items-center justify-center rounded",
+              view === "board" ? "bg-secondary text-foreground" : "text-muted-foreground",
+            )}
+          >
+            <Columns3 className="size-4" />
+          </button>
+        </div>
       </div>
 
       <div className="mb-5 flex items-center gap-2.5 rounded-lg border border-border bg-card px-3.5 py-2.5">
@@ -129,6 +158,8 @@ export default function ProjectsPage() {
             Create one above to start grouping tasks, follow-ups, and learning toward an outcome.
           </p>
         </div>
+      ) : view === "board" ? (
+        <ProjectsBoard />
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {projects.map((p) => (
