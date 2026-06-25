@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createClient } from "@/lib/supabase/client"
 
 export type TaskPriority = "none" | "low" | "medium" | "high"
+export type Recurrence = "none" | "daily" | "weekly" | "monthly"
 
 export type Task = {
   id: string
@@ -16,12 +17,26 @@ export type Task = {
   parent_task_id: string | null
   project_id: string | null
   sort_order: number
+  recurrence_rule: string | null
   created_at: string
 }
 
 const supabase = createClient()
 const SELECT =
-  "id, title, notes, priority, scheduled_date, due_date, completed_at, parent_task_id, project_id, sort_order, created_at"
+  "id, title, notes, priority, scheduled_date, due_date, completed_at, parent_task_id, project_id, sort_order, recurrence_rule, created_at"
+
+/** Advance a YYYY-MM-DD string by one recurrence interval (local). */
+function nextOccurrence(dateStr: string, rule: string): string {
+  const [y, m, d] = dateStr.split("-").map(Number)
+  const dt = new Date(y, m - 1, d)
+  if (rule === "daily") dt.setDate(dt.getDate() + 1)
+  else if (rule === "weekly") dt.setDate(dt.getDate() + 7)
+  else if (rule === "monthly") dt.setMonth(dt.getMonth() + 1)
+  const yy = dt.getFullYear()
+  const mm = String(dt.getMonth() + 1).padStart(2, "0")
+  const dd = String(dt.getDate()).padStart(2, "0")
+  return `${yy}-${mm}-${dd}`
+}
 
 export const tasksKey = ["tasks"] as const
 export const subtasksKey = (parentId: string) => ["subtasks", parentId] as const
@@ -123,12 +138,34 @@ export function useUpdateTask() {
 }
 
 export function useToggleTask() {
-  const update = useUpdateTask()
-  return (task: Task) =>
-    update.mutate({
-      id: task.id,
-      patch: { completed_at: task.completed_at ? null : new Date().toISOString() },
-    })
+  const qc = useQueryClient()
+  const mutation = useMutation({
+    mutationFn: async (task: Task) => {
+      const completing = !task.completed_at
+      const { error } = await supabase
+        .from("tasks")
+        .update({ completed_at: completing ? new Date().toISOString() : null })
+        .eq("id", task.id)
+      if (error) throw error
+
+      // Recurring tasks spawn their next occurrence on completion.
+      if (completing && task.recurrence_rule && task.recurrence_rule !== "none") {
+        const base = task.scheduled_date ?? task.due_date
+        if (base) {
+          const next = nextOccurrence(base, task.recurrence_rule)
+          await supabase.from("tasks").insert({
+            title: task.title,
+            priority: task.priority,
+            project_id: task.project_id,
+            recurrence_rule: task.recurrence_rule,
+            ...(task.scheduled_date ? { scheduled_date: next } : { due_date: next }),
+          })
+        }
+      }
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: tasksKey }),
+  })
+  return (task: Task) => mutation.mutate(task)
 }
 
 export function useDeleteTask() {

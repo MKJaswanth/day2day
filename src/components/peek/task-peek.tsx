@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react"
 import { RichText } from "@/components/editor/rich-text"
 import { RelatedItems } from "@/components/peek/related-items"
 import {
+  type Recurrence,
   type Task,
   type TaskPriority,
   useAddTask,
@@ -18,6 +19,7 @@ import { useUIStore } from "@/lib/ui-store"
 import { cn } from "@/lib/utils"
 
 const PRIORITIES: TaskPriority[] = ["none", "low", "medium", "high"]
+const RECURRENCES: Recurrence[] = ["none", "daily", "weekly", "monthly"]
 
 export function TaskPeek({ taskId }: { taskId: string }) {
   const { closePeek } = useUIStore()
@@ -129,6 +131,24 @@ export function TaskPeek({ taskId }: { taskId: string }) {
               {PRIORITIES.map((p) => (
                 <option key={p} value={p}>
                   {p}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label="Repeat">
+            <select
+              value={task.recurrence_rule ?? "none"}
+              onChange={(e) =>
+                update.mutate({
+                  id: taskId,
+                  patch: { recurrence_rule: e.target.value === "none" ? null : e.target.value },
+                })
+              }
+              className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm capitalize outline-none focus-visible:border-ring"
+            >
+              {RECURRENCES.map((r) => (
+                <option key={r} value={r}>
+                  {r}
                 </option>
               ))}
             </select>
