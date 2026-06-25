@@ -1,9 +1,10 @@
 "use client"
 
-import { BookOpen, CheckSquare, Clock } from "lucide-react"
+import { AlertCircle, BookOpen, CheckSquare, Clock, FolderKanban } from "lucide-react"
 import { todayStr } from "@/lib/dates"
 import { useFollowUps } from "@/lib/queries/follow-ups"
 import { useLearningItems } from "@/lib/queries/learning"
+import { useProjects } from "@/lib/queries/projects"
 import { useTasks } from "@/lib/queries/tasks"
 import { useUIStore } from "@/lib/ui-store"
 import { AddTask } from "./add-task"
@@ -32,6 +33,7 @@ export function TodayAgenda() {
   const { data: tasks } = useTasks()
   const { data: followUps } = useFollowUps()
   const { data: learning } = useLearningItems()
+  const { data: projects } = useProjects()
   const openPeek = useUIStore((s) => s.openPeek)
 
   // Tasks scheduled for today or earlier, or due today or earlier — not done.
@@ -49,6 +51,7 @@ export function TodayAgenda() {
     (f) => f.status === "open" && f.nudge_date != null && f.nudge_date <= t,
   )
   const inProgressLearning = (learning ?? []).filter((l) => l.status === "in_progress")
+  const activeProjects = (projects ?? []).filter((p) => p.status === "active")
 
   return (
     <div className="space-y-8">
@@ -91,6 +94,34 @@ export function TodayAgenda() {
                 </button>
               </li>
             ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {activeProjects.length > 0 ? (
+        <section>
+          <SectionHead icon={FolderKanban} label="Active projects" count={activeProjects.length} />
+          <ul className="divide-y divide-border rounded-lg border border-border bg-card">
+            {activeProjects.map((p) => {
+              const needsNextAction = !p.next_action_task_id
+              return (
+                <li key={p.id}>
+                  <button
+                    type="button"
+                    onClick={() => openPeek({ type: "project", id: p.id })}
+                    className="flex w-full items-center gap-3 px-3.5 py-2.5 text-left"
+                  >
+                    <FolderKanban className="size-4 shrink-0 text-muted-foreground/60" />
+                    <span className="flex-1 text-sm">{p.title}</span>
+                    {needsNextAction ? (
+                      <span className="flex items-center gap-1 text-xs text-warning">
+                        <AlertCircle className="size-3" /> no next action
+                      </span>
+                    ) : null}
+                  </button>
+                </li>
+              )
+            })}
           </ul>
         </section>
       ) : null}

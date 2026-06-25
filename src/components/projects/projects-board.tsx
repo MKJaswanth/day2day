@@ -87,10 +87,11 @@ function Column({
   )
 }
 
-export function ProjectsBoard() {
+export function ProjectsBoard({ areaId }: { areaId?: string | null }) {
   const { data: projects } = useProjects()
   const update = useUpdateProject()
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
+  const filtered = (projects ?? []).filter((p) => !areaId || p.area_id === areaId)
 
   function onDragEnd(e: DragEndEvent) {
     const status = e.over?.id as ProjectStatus | undefined
@@ -108,7 +109,7 @@ export function ProjectsBoard() {
             key={c.status}
             status={c.status}
             label={c.label}
-            projects={(projects ?? []).filter((p) => p.status === c.status)}
+            projects={filtered.filter((p) => p.status === c.status)}
           />
         ))}
       </div>

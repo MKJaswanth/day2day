@@ -3,6 +3,7 @@
 import { AlertCircle, Columns3, FolderKanban, List, Plus } from "lucide-react"
 import { useState } from "react"
 import { ProjectsBoard } from "@/components/projects/projects-board"
+import { useAreas } from "@/lib/queries/areas"
 import {
   type Project,
   type ProjectStatus,
@@ -87,10 +88,11 @@ function ProjectCard({ project }: { project: Project }) {
 
 export default function ProjectsPage() {
   const { data: projects, isLoading } = useProjects()
+  const { data: areas } = useAreas()
   const add = useAddProject()
   const [value, setValue] = useState("")
-
   const [view, setView] = useState<"list" | "board">("list")
+  const [areaId, setAreaId] = useState<string | null>(null)
 
   function submit() {
     if (!value.trim()) return
@@ -146,6 +148,38 @@ export default function ProjectsPage() {
         />
       </div>
 
+      {areas && areas.length > 0 ? (
+        <div className="mb-5 flex flex-wrap items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setAreaId(null)}
+            className={cn(
+              "rounded-full px-2.5 py-1 text-xs transition-colors",
+              areaId === null
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-muted-foreground hover:text-foreground",
+            )}
+          >
+            All
+          </button>
+          {areas.map((a) => (
+            <button
+              key={a.id}
+              type="button"
+              onClick={() => setAreaId(a.id)}
+              className={cn(
+                "rounded-full px-2.5 py-1 text-xs transition-colors",
+                areaId === a.id
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {a.name}
+            </button>
+          ))}
+        </div>
+      ) : null}
+
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Loading…</p>
       ) : !projects || projects.length === 0 ? (
@@ -159,12 +193,14 @@ export default function ProjectsPage() {
           </p>
         </div>
       ) : view === "board" ? (
-        <ProjectsBoard />
+        <ProjectsBoard areaId={areaId} />
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
-          {projects.map((p) => (
-            <ProjectCard key={p.id} project={p} />
-          ))}
+          {projects
+            .filter((p) => !areaId || p.area_id === areaId)
+            .map((p) => (
+              <ProjectCard key={p.id} project={p} />
+            ))}
         </div>
       )}
     </div>
