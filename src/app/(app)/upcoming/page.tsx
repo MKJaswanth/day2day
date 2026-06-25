@@ -1,9 +1,12 @@
 "use client"
 
-import { CalendarClock } from "lucide-react"
+import { CalendarClock, CalendarDays, List } from "lucide-react"
+import { useState } from "react"
+import { CalendarView } from "@/components/tasks/calendar-view"
 import { TaskRow } from "@/components/tasks/task-row"
 import { toDateStr } from "@/lib/dates"
 import { type Task, useTasks } from "@/lib/queries/tasks"
+import { cn } from "@/lib/utils"
 
 function effectiveDate(t: Task): string | null {
   return t.scheduled_date ?? t.due_date
@@ -17,6 +20,7 @@ function addDays(base: Date, days: number) {
 
 export default function UpcomingPage() {
   const { data: tasks } = useTasks()
+  const [view, setView] = useState<"list" | "calendar">("list")
   const today = new Date()
   const todayStr = toDateStr(today)
 
@@ -50,15 +54,45 @@ export default function UpcomingPage() {
   if (later.length) groups.push({ label: "Later", tasks: later })
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-8">
-      <div className="mb-6">
-        <h2 className="font-serif text-2xl font-semibold tracking-tight">Upcoming</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          The week ahead. Hover a task to defer it a day or a week.
-        </p>
+    <div className={cn("px-6 py-8", view === "calendar" ? "max-w-none" : "mx-auto max-w-2xl")}>
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div>
+          <h2 className="font-serif text-2xl font-semibold tracking-tight">Upcoming</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {view === "list"
+              ? "The week ahead. Hover a task to defer it a day or a week."
+              : "Your scheduled and due items, by month."}
+          </p>
+        </div>
+        <div className="flex shrink-0 items-center gap-1 rounded-md border border-border p-0.5">
+          <button
+            type="button"
+            aria-label="List view"
+            onClick={() => setView("list")}
+            className={cn(
+              "flex size-7 items-center justify-center rounded",
+              view === "list" ? "bg-secondary text-foreground" : "text-muted-foreground",
+            )}
+          >
+            <List className="size-4" />
+          </button>
+          <button
+            type="button"
+            aria-label="Calendar view"
+            onClick={() => setView("calendar")}
+            className={cn(
+              "flex size-7 items-center justify-center rounded",
+              view === "calendar" ? "bg-secondary text-foreground" : "text-muted-foreground",
+            )}
+          >
+            <CalendarDays className="size-4" />
+          </button>
+        </div>
       </div>
 
-      {groups.length === 0 ? (
+      {view === "calendar" ? (
+        <CalendarView />
+      ) : groups.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border py-16 text-center">
           <div className="flex size-12 items-center justify-center rounded-full bg-secondary">
             <CalendarClock className="size-6 text-muted-foreground" />
